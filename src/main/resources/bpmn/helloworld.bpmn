@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_03fzarq" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="2.0.3">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_03fzarq" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="2.0.3">
   <bpmn:process id="Hello_World" isExecutable="true">
-    <bpmn:extensionElements>
-      <camunda:properties>
-        <camunda:property name="approve" value="true" />
-      </camunda:properties>
-    </bpmn:extensionElements>
     <bpmn:startEvent id="started_state" name="Started">
       <bpmn:outgoing>flow_started_helloworld</bpmn:outgoing>
     </bpmn:startEvent>
@@ -15,11 +10,6 @@
       <bpmn:incoming>SequenceFlow_0qblrdz</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:userTask id="HelloWorld" name="Hello World">
-      <bpmn:extensionElements>
-        <camunda:inputOutput>
-          <camunda:outputParameter name="approve" />
-        </camunda:inputOutput>
-      </bpmn:extensionElements>
       <bpmn:incoming>flow_started_helloworld</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0tk5o54</bpmn:outgoing>
     </bpmn:userTask>

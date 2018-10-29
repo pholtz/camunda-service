@@ -1,28 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1ermc0z" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="2.0.3">
-  <bpmn:process id="Process_1" isExecutable="true">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_1ermc0z" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="2.0.3">
+  <bpmn:process id="resq" isExecutable="true">
     <bpmn:startEvent id="submitted_state" name="Submitted">
-      <bpmn:outgoing>flow_submitted_to_manager_approved_gate</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_1pfz2p9</bpmn:outgoing>
     </bpmn:startEvent>
     <bpmn:exclusiveGateway id="manager_approval_gate" name="Manager Approved?">
-      <bpmn:incoming>flow_submitted_to_manager_approved_gate</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_0cs5ppb</bpmn:incoming>
       <bpmn:outgoing>manager_approved_gate_yes</bpmn:outgoing>
       <bpmn:outgoing>manager_approved_gate_no</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:sequenceFlow id="flow_submitted_to_manager_approved_gate" sourceRef="submitted_state" targetRef="manager_approval_gate" />
-    <bpmn:task id="approved_state" name="Evaluate Request">
-      <bpmn:incoming>manager_approved_gate_yes</bpmn:incoming>
-      <bpmn:outgoing>SequenceFlow_1ig6m9b</bpmn:outgoing>
-    </bpmn:task>
     <bpmn:sequenceFlow id="manager_approved_gate_yes" name="Yes" sourceRef="manager_approval_gate" targetRef="approved_state">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">yes</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${evaluate == 'true'}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:task id="reject_request_pending_notification" name="Reject Request">
-      <bpmn:incoming>manager_approved_gate_no</bpmn:incoming>
-      <bpmn:outgoing>flow_reject_request_to_notify_user_rejected</bpmn:outgoing>
-    </bpmn:task>
     <bpmn:sequenceFlow id="manager_approved_gate_no" name="No" sourceRef="manager_approval_gate" targetRef="reject_request_pending_notification">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">no</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${evaluate != 'true'}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:endEvent id="rejected_state" name="Rejected">
       <bpmn:incoming>flow_notify_user_rejected_to_rejected_state</bpmn:incoming>
@@ -33,44 +24,63 @@
       <bpmn:outgoing>technically_feasible_gate_yes</bpmn:outgoing>
     </bpmn:exclusiveGateway>
     <bpmn:sequenceFlow id="SequenceFlow_1ig6m9b" sourceRef="approved_state" targetRef="technically_feasible_gate" />
-    <bpmn:task id="cancel_request_pending_notification" name="Cancel Request">
-      <bpmn:incoming>technically_feasible_gate_no</bpmn:incoming>
-      <bpmn:outgoing>flow_cancel_request_to_notify_user_cancelled</bpmn:outgoing>
-    </bpmn:task>
     <bpmn:sequenceFlow id="technically_feasible_gate_no" name="No" sourceRef="technically_feasible_gate" targetRef="cancel_request_pending_notification">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">no</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${feasible != 'true'}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:task id="in_progress_state" name="Complete Request">
-      <bpmn:incoming>technically_feasible_gate_yes</bpmn:incoming>
-      <bpmn:outgoing>flow_complete_request_to_notify_user_completed</bpmn:outgoing>
-    </bpmn:task>
     <bpmn:sequenceFlow id="technically_feasible_gate_yes" name="Yes" sourceRef="technically_feasible_gate" targetRef="in_progress_state">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">yes</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${feasible == 'true'}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="flow_complete_request_to_notify_user_completed" sourceRef="in_progress_state" targetRef="notify_user_completed" />
     <bpmn:endEvent id="completed_state" name="Completed">
       <bpmn:incoming>flow_notify_user_completed_to_completed_state</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:task id="notify_user_completed" name="Notify User Completed">
-      <bpmn:incoming>flow_complete_request_to_notify_user_completed</bpmn:incoming>
-      <bpmn:outgoing>flow_notify_user_completed_to_completed_state</bpmn:outgoing>
-    </bpmn:task>
     <bpmn:sequenceFlow id="flow_notify_user_completed_to_completed_state" sourceRef="notify_user_completed" targetRef="completed_state" />
     <bpmn:endEvent id="cancelled_state" name="Cancelled">
       <bpmn:incoming>flow_notify_user_cancelled_to_cancelled_state</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:task id="notify_user_cancelled" name="Notify User Cancelled">
-      <bpmn:incoming>flow_cancel_request_to_notify_user_cancelled</bpmn:incoming>
-      <bpmn:outgoing>flow_notify_user_cancelled_to_cancelled_state</bpmn:outgoing>
-    </bpmn:task>
     <bpmn:sequenceFlow id="flow_cancel_request_to_notify_user_cancelled" sourceRef="cancel_request_pending_notification" targetRef="notify_user_cancelled" />
     <bpmn:sequenceFlow id="flow_notify_user_cancelled_to_cancelled_state" sourceRef="notify_user_cancelled" targetRef="cancelled_state" />
-    <bpmn:task id="notify_user_rejected" name="Notify User Rejected">
-      <bpmn:incoming>flow_reject_request_to_notify_user_rejected</bpmn:incoming>
-      <bpmn:outgoing>flow_notify_user_rejected_to_rejected_state</bpmn:outgoing>
-    </bpmn:task>
     <bpmn:sequenceFlow id="flow_reject_request_to_notify_user_rejected" sourceRef="reject_request_pending_notification" targetRef="notify_user_rejected" />
     <bpmn:sequenceFlow id="flow_notify_user_rejected_to_rejected_state" sourceRef="notify_user_rejected" targetRef="rejected_state" />
+    <bpmn:userTask id="reject_request_pending_notification" name="Reject Request">
+      <bpmn:incoming>manager_approved_gate_no</bpmn:incoming>
+      <bpmn:outgoing>flow_reject_request_to_notify_user_rejected</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="approved_state" name="Evaluate Request">
+      <bpmn:incoming>manager_approved_gate_yes</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1ig6m9b</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="cancel_request_pending_notification" name="Cancel Request">
+      <bpmn:incoming>technically_feasible_gate_no</bpmn:incoming>
+      <bpmn:outgoing>flow_cancel_request_to_notify_user_cancelled</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="in_progress_state" name="Complete Request">
+      <bpmn:incoming>technically_feasible_gate_yes</bpmn:incoming>
+      <bpmn:outgoing>flow_complete_request_to_notify_user_completed</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="received_state" name="Receive Request">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="evaluate" label="Evaluate" type="string" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_1pfz2p9</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0cs5ppb</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="SequenceFlow_1pfz2p9" sourceRef="submitted_state" targetRef="received_state" />
+    <bpmn:sequenceFlow id="SequenceFlow_0cs5ppb" sourceRef="received_state" targetRef="manager_approval_gate" />
+    <bpmn:userTask id="notify_user_completed" name="Notify User Completed">
+      <bpmn:incoming>flow_complete_request_to_notify_user_completed</bpmn:incoming>
+      <bpmn:outgoing>flow_notify_user_completed_to_completed_state</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="notify_user_cancelled" name="Notify User Cancelled">
+      <bpmn:incoming>flow_cancel_request_to_notify_user_cancelled</bpmn:incoming>
+      <bpmn:outgoing>flow_notify_user_cancelled_to_cancelled_state</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="notify_user_rejected" name="Notify User Rejected">
+      <bpmn:incoming>flow_reject_request_to_notify_user_rejected</bpmn:incoming>
+      <bpmn:outgoing>flow_notify_user_rejected_to_rejected_state</bpmn:outgoing>
+    </bpmn:userTask>
     <bpmn:textAnnotation id="TextAnnotation_113l6h5">
       <bpmn:text>In Progress</bpmn:text>
     </bpmn:textAnnotation>
@@ -81,11 +91,11 @@
     <bpmn:association id="Association_02x486c" sourceRef="approved_state" targetRef="TextAnnotation_0d7vwzf" />
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
-    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="resq">
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="submitted_state">
-        <dc:Bounds x="683" y="33" width="36" height="36" />
+        <dc:Bounds x="683" y="-54" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="676" y="10" width="50" height="14" />
+          <dc:Bounds x="677" y="-77" width="48" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ExclusiveGateway_06f19xm_di" bpmnElement="manager_approval_gate" isMarkerVisible="true">
@@ -94,13 +104,6 @@
           <dc:Bounds x="675" y="199" width="53" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_00w4eo0_di" bpmnElement="flow_submitted_to_manager_approved_gate">
-        <di:waypoint x="701" y="69" />
-        <di:waypoint x="701" y="142" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="Task_0k44th1_di" bpmnElement="approved_state">
-        <dc:Bounds x="520" y="127" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_0pvelzu_di" bpmnElement="manager_approved_gate_yes">
         <di:waypoint x="676" y="167" />
         <di:waypoint x="620" y="167" />
@@ -108,9 +111,6 @@
           <dc:Bounds x="639" y="149" width="18" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="Task_03tj3er_di" bpmnElement="reject_request_pending_notification">
-        <dc:Bounds x="788" y="127" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_1p5r2na_di" bpmnElement="manager_approved_gate_no">
         <di:waypoint x="726" y="167" />
         <di:waypoint x="788" y="167" />
@@ -134,9 +134,6 @@
         <di:waypoint x="570" y="207" />
         <di:waypoint x="570" y="246" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="Task_0aiby83_di" bpmnElement="cancel_request_pending_notification">
-        <dc:Bounds x="651" y="231" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_12i9n4a_di" bpmnElement="technically_feasible_gate_no">
         <di:waypoint x="595" y="271" />
         <di:waypoint x="651" y="271" />
@@ -144,9 +141,6 @@
           <dc:Bounds x="616" y="253" width="15" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="Task_177todq_di" bpmnElement="in_progress_state">
-        <dc:Bounds x="382" y="231" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_0cip4h2_di" bpmnElement="technically_feasible_gate_yes">
         <di:waypoint x="545" y="271" />
         <di:waypoint x="482" y="271" />
@@ -164,9 +158,6 @@
           <dc:Bounds x="406" y="549" width="54" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Task_0iri0ed_di" bpmnElement="notify_user_completed">
-        <dc:Bounds x="382" y="395" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_1aba3m2_di" bpmnElement="flow_notify_user_completed_to_completed_state">
         <di:waypoint x="432" y="475" />
         <di:waypoint x="432" y="506" />
@@ -176,9 +167,6 @@
         <bpmndi:BPMNLabel>
           <dc:Bounds x="677" y="549" width="49" height="14" />
         </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Task_1qogkfn_di" bpmnElement="notify_user_cancelled">
-        <dc:Bounds x="651" y="395" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_1ywp5w4_di" bpmnElement="flow_cancel_request_to_notify_user_cancelled">
         <di:waypoint x="701" y="311" />
@@ -202,9 +190,6 @@
         <di:waypoint x="527" y="128" />
         <di:waypoint x="491" y="95" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="Task_19uzimh_di" bpmnElement="notify_user_rejected">
-        <dc:Bounds x="788" y="395" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_0sr61bw_di" bpmnElement="flow_reject_request_to_notify_user_rejected">
         <di:waypoint x="838" y="207" />
         <di:waypoint x="838" y="395" />
@@ -213,6 +198,38 @@
         <di:waypoint x="838" y="475" />
         <di:waypoint x="838" y="506" />
       </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="UserTask_0colpf8_di" bpmnElement="reject_request_pending_notification">
+        <dc:Bounds x="788" y="127" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_01ajqi6_di" bpmnElement="approved_state">
+        <dc:Bounds x="520" y="127" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_1o5i1fn_di" bpmnElement="cancel_request_pending_notification">
+        <dc:Bounds x="651" y="231" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_1xdl6sh_di" bpmnElement="in_progress_state">
+        <dc:Bounds x="382" y="231" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_14yyp0m_di" bpmnElement="received_state">
+        <dc:Bounds x="651" y="27" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1pfz2p9_di" bpmnElement="SequenceFlow_1pfz2p9">
+        <di:waypoint x="701" y="-18" />
+        <di:waypoint x="701" y="27" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0cs5ppb_di" bpmnElement="SequenceFlow_0cs5ppb">
+        <di:waypoint x="701" y="107" />
+        <di:waypoint x="701" y="142" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="UserTask_06yjsbi_di" bpmnElement="notify_user_completed">
+        <dc:Bounds x="382" y="395" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_1ckocq3_di" bpmnElement="notify_user_cancelled">
+        <dc:Bounds x="651" y="395" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_1lt7fyq_di" bpmnElement="notify_user_rejected">
+        <dc:Bounds x="788" y="395" width="100" height="80" />
+      </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </bpmn:definitions>
