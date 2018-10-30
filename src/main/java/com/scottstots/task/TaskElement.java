@@ -4,11 +4,19 @@ import java.util.List;
 
 public class TaskElement
 {
+	private String key;
 	private String name;
 	private String designation; // Number of executions in this status
 	private String image;
 	private List<TaskElement> subordinates;
 	
+	
+	public String getKey() {
+		return key;
+	}
+	public void setKey(String key) {
+		this.key = key;
+	}
 	public String getName() {
 		return name;
 	}

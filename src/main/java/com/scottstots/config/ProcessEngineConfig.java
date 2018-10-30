@@ -1,7 +1,6 @@
 package com.scottstots.config;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 import javax.sql.DataSource;
 
